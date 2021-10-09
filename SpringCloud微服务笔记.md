@@ -108,93 +108,93 @@
 
       
 
-   ## Gateway
+## Gateway
 
-   三大核心概念：
+三大核心概念：
 
-   1. Route 路由 路由是构建网关的基本模块，它由ID，目标URI，一系列的断言和过滤组成，如果断言为true则匹配该路由
+1. Route 路由 路由是构建网关的基本模块，它由ID，目标URI，一系列的断言和过滤组成，如果断言为true则匹配该路由
 
-   2. Predicate 断言 开发人员可以匹配HTTP请求中的所有内容（例如请求头或请求参数），如果请求与断言相匹配则进行路由
-   3. Filter 过滤 指的是Spring框架中GatewayFilter的实例，使用过滤器，可以在请求被路由前或路由后对请求进行修改
+2. Predicate 断言 开发人员可以匹配HTTP请求中的所有内容（例如请求头或请求参数），如果请求与断言相匹配则进行路由
+3. Filter 过滤 指的是Spring框架中GatewayFilter的实例，使用过滤器，可以在请求被路由前或路由后对请求进行修改
 
-   1.添加依赖
+1.添加依赖
 
-   ```java
-   <!--gateway-->
-           <dependency>
-               <groupId>org.springframework.cloud</groupId>
-               <artifactId>spring-cloud-starter-gateway</artifactId>
-           </dependency>
-   ```
+```java
+<!--gateway-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+```
 
-   2.yml文件配置
+2.yml文件配置
 
-   ```java
-   server:
-     port: 9527
-   
-   spring:
-     application:
-       name: cloud-gateway
-     cloud:
-       gateway:
-         discovery:
-           locator:
-             enabled: true #开启从注册中心动态创建路由的功能，利用微服务名进行路由
-         routes:
-           - id: payment_routh #payment_route    #路由的ID，没有固定规则但要求唯一，建议配合服务名
-             #uri: http://localhost:8001          #匹配后提供服务的路由地址
-             uri: lb://cloud-payment-service #匹配后提供服务的路由地址
-             predicates:
-               - Path=/payment/get/**         # 断言，路径相匹配的进行路由
-   
-           - id: payment_routh2 #payment_route    #路由的ID，没有固定规则但要求唯一，建议配合服务名
-             #uri: http://localhost:8001          #匹配后提供服务的路由地址
-             uri: lb://cloud-payment-service #匹配后提供服务的路由地址
-             predicates:
-               - Path=/payment/lb/**         # 断言，路径相匹配的进行路由
-               #- After=2020-02-21T15:51:37.485+08:00[Asia/Shanghai]
-               #- Cookie=username,zzyy
-               #- Header=X-Request-Id, \d+  # 请求头要有X-Request-Id属性并且值为整数的正则表达式
-         nacos:
-           discovery:
-             server-addr: 10.221.11.133:8848
-   
-   ```
+```java
+server:
+  port: 9527
 
-   另外一种路由配置方式
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true #开启从注册中心动态创建路由的功能，利用微服务名进行路由
+      routes:
+        - id: payment_routh #payment_route    #路由的ID，没有固定规则但要求唯一，建议配合服务名
+          #uri: http://localhost:8001          #匹配后提供服务的路由地址
+          uri: lb://cloud-payment-service #匹配后提供服务的路由地址
+          predicates:
+            - Path=/payment/get/**         # 断言，路径相匹配的进行路由
 
-   ```java
-   @Configuration
-   public class GateWayConfig
-   {
-       @Bean
-       public RouteLocator customRouteLocator(RouteLocatorBuilder routeLocatorBuilder)
-       {
-           RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();
-   
-           routes.route("path_route_atguigu",
-                   r -> r.path("/guonei")
-                           .uri("http://news.baidu.com/guonei")).build();
-   
-           return routes.build();
-       }
-   }
-   ```
+        - id: payment_routh2 #payment_route    #路由的ID，没有固定规则但要求唯一，建议配合服务名
+          #uri: http://localhost:8001          #匹配后提供服务的路由地址
+          uri: lb://cloud-payment-service #匹配后提供服务的路由地址
+          predicates:
+            - Path=/payment/lb/**         # 断言，路径相匹配的进行路由
+            #- After=2020-02-21T15:51:37.485+08:00[Asia/Shanghai]
+            #- Cookie=username,zzyy
+            #- Header=X-Request-Id, \d+  # 请求头要有X-Request-Id属性并且值为整数的正则表达式
+      nacos:
+        discovery:
+          server-addr: 10.221.11.133:8848
 
-   
+```
 
-   开启动态路由方式
+另外一种路由配置方式
 
-   yml文件中discover.locator.enabled = true
+```java
+@Configuration
+public class GateWayConfig
+{
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder routeLocatorBuilder)
+    {
+        RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();
 
-   uri需要写 lb:// 后面添加微服务名
+        routes.route("path_route_atguigu",
+                r -> r.path("/guonei")
+                        .uri("http://news.baidu.com/guonei")).build();
 
-   
+        return routes.build();
+    }
+}
+```
 
-   常用predicate断言 可以去看官方文档
 
-   ![image-20210911110646314](C:\Users\chen\AppData\Roaming\Typora\typora-user-images\image-20210911110646314.png)
+
+开启动态路由方式
+
+yml文件中discover.locator.enabled = true
+
+uri需要写 lb:// 后面添加微服务名
+
+
+
+常用predicate断言 可以去看官方文档
+
+![image-20210911110646314](C:\Users\chen\AppData\Roaming\Typora\typora-user-images\image-20210911110646314.png)
 
 Filter 声明周期，pre或者post 种类两种 GatewayFilter 和GlobalFilter
 
@@ -307,54 +307,54 @@ Feign是一个声明式的Web服务客户端，只需要创建一个接口并且
    ```
 
    
+
+## Hystrix
+
+服务降级：服务器忙，请稍后再试，不让客户端等待并立刻返回一个友好提示，fallback 
+
+服务熔断：类比保险丝达到最大服务访问后，直接拒绝访问，拉闸限电，然后调用服务降级的方法并返回友好提示
+
+服务限流：秒杀高并发操作，严禁一窝蜂的过来拥挤，大家排队，一秒钟N个，有序进行
+
+
+
+解决方式：1. 对方服务超时了，调用者不能一直卡死等待，必须由服务降级
+
+				2. 对方服务宕机了，调用者不能一直卡死等待，必须有服务降级
+				3. 对方服务Ok,调用者自己出故障或有自我要求（自己的等待时间小于服务提供者）
+
+一.服务调用者
+
+1. 添加依赖
+
+   ```java
+    <dependency>
+               <groupId>org.springframework.cloud</groupId>
+               <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+           </dependency>
+   ```
+
+2. service层上加入@HystrixCommand注解 一旦调用服务方法失败并抛出了错误信息后，会自动调用@HystrixCommand标注好的fallbackMethod调用类中的指定方法
+
+   ```java
+      @HystrixCommand(fallbackMethod = "paymentInfo_TimeOutHandler",commandProperties = {
+               @HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds",value="5000")//这里是设置了超时时间，超过就返回
+       })
+       public String paymentInfo_TimeOut(Integer id)
+       {
+           //int age = 10/0;
+           try { TimeUnit.MILLISECONDS.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
+           return "线程池:  "+Thread.currentThread().getName()+" id:  "+id+"\t"+"O(∩_∩)O哈哈~"+"  耗时(秒): ";
+       }
+       public String paymentInfo_TimeOutHandler(Integer id)
+       {
+           return "线程池:  "+Thread.currentThread().getName()+"  8001系统繁忙或者运行报错，请稍后再试,id:  "+id+"\t"+"o(╥﹏╥)o";
+       }
+   ```
+
    
-   ## Hystrix
-   
-   服务降级：服务器忙，请稍后再试，不让客户端等待并立刻返回一个友好提示，fallback 
-   
-   服务熔断：类比保险丝达到最大服务访问后，直接拒绝访问，拉闸限电，然后调用服务降级的方法并返回友好提示
-   
-   服务限流：秒杀高并发操作，严禁一窝蜂的过来拥挤，大家排队，一秒钟N个，有序进行
-   
-   
-   
-   解决方式：1. 对方服务超时了，调用者不能一直卡死等待，必须由服务降级
-   
-   				2. 对方服务宕机了，调用者不能一直卡死等待，必须有服务降级
-      				3. 对方服务Ok,调用者自己出故障或有自我要求（自己的等待时间小于服务提供者）
-   
-   一.服务调用者
-   
-   1. 添加依赖
-   
-      ```java
-       <dependency>
-                  <groupId>org.springframework.cloud</groupId>
-                  <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-              </dependency>
-      ```
-   
-   2. service层上加入@HystrixCommand注解 一旦调用服务方法失败并抛出了错误信息后，会自动调用@HystrixCommand标注好的fallbackMethod调用类中的指定方法
-   
-      ```java
-         @HystrixCommand(fallbackMethod = "paymentInfo_TimeOutHandler",commandProperties = {
-                  @HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds",value="5000")//这里是设置了超时时间，超过就返回
-          })
-          public String paymentInfo_TimeOut(Integer id)
-          {
-              //int age = 10/0;
-              try { TimeUnit.MILLISECONDS.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
-              return "线程池:  "+Thread.currentThread().getName()+" id:  "+id+"\t"+"O(∩_∩)O哈哈~"+"  耗时(秒): ";
-          }
-          public String paymentInfo_TimeOutHandler(Integer id)
-          {
-              return "线程池:  "+Thread.currentThread().getName()+"  8001系统繁忙或者运行报错，请稍后再试,id:  "+id+"\t"+"o(╥﹏╥)o";
-          }
-      ```
-   
-      
-   
-   3. 主启动类添加新注解@EnableCircuitBreaker
+
+3. 主启动类添加新注解@EnableCircuitBreaker
 
 存在问题：每个业务方法对应要给兜底的方法，代码膨胀，统一和自定义分 开
 
@@ -577,4 +577,6 @@ Hytrix图形化监控
 然后在输入需要监控的微服务网址，这里的示例是http://localhost:8001/hystrix.stream
 
 ![image-20210913112928513](C:\Users\chen\AppData\Roaming\Typora\typora-user-images\image-20210913112928513.png)
+
+### 
 

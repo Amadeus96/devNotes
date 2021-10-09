@@ -544,5 +544,28 @@ Authorization中选择basic Auth 输入客户端账号密码 body中添加grant_
 
 在访问接口时，在header中添加Authorization 格式如下 bearer 空格eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsib2F1dGgiLCJvYXV0aF9jbGllbnQiXSwidXNlcl9uYW1lIjoibWFjcm8iLCJzY29wZSI6WyJhbGwiXSwiZXhwIjoxNjMyMjc0ODM3LCJhdXRob3JpdGllcyI6WyJhZG1pbiJdLCJqdGkiOiJlNzc4ODVmMC1mZjA4LTQxYzMtYWQ5OC1mMTM2ZDM2ODgzOGUiLCJjbGllbnRfaWQiOiJhZG1pbiIsImVuaGFuY2UiOiJlbmhhbmNlIGluZm8ifQ.Ko39YBK2lmup1PVuuCQ-R-ZBZLBlUbJpzX2iZ8FGgdg
 
+## Feign调用微服务接口
 
+需要增加拦截器
+
+```java
+@Configuration
+public class FeignOauth2RequestInterceptor implements RequestInterceptor {
+
+    private final String AUTHORIZATION_HEADER = "Authorization";
+    private final String BEARER_TOKEN_TYPE = "Bearer";
+
+    @Override
+    public void apply(RequestTemplate requestTemplate) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication != null && authentication.getDetails() instanceof OAuth2AuthenticationDetails) {
+            OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
+            requestTemplate.header(AUTHORIZATION_HEADER, String.format("%s %s", BEARER_TOKEN_TYPE, details.getTokenValue()));
+        }
+
+    }
+}
+
+```
 
