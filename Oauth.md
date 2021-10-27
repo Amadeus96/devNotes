@@ -569,3 +569,6 @@ public class FeignOauth2RequestInterceptor implements RequestInterceptor {
 
 ```
 
+## 客户端权限问题
+
+如果需要对接口增加权限判断，ResourceServerConfig要加注解@EnableGlobalMethodSecurity(prePostEnabled=true),并且在接口上添加@PreAuthorize("hasAuthority('admin')")，注意除了客户端模式，其它模式均是使用的是用户表的authorities，客户端模式是客户端表的authorities。
